@@ -41,13 +41,14 @@
 ## section and the administration section. Variables set by these macros are prefixed with "pp".
 
 ## Loads the administration settings into $ppLocation, $ppLocationRef, $ppParentSpaces, $ppReaders, $ppOwnerRights and
-## $ppReaderGroups. The settings page is readable by administrators only, hence getDocumentAsAuthor.
+## $ppReaderGroups. They live on PersonalPages.Code.Configuration, a "configuration" XAR entry: installed with the
+## defaults, never touched by upgrades, and readable by administrators only (hence getDocumentAsAuthor).
 #macro (ppLoadSettings)
   #set ($ppLocation = 'PersonalPages.WebHome')
   #set ($ppReaders = 'loggedIn')
   #set ($ppOwnerRights = ['edit', 'delete'])
   #set ($ppReaderGroups = [])
-  #set ($ppSettingsRef = $services.model.createDocumentReference('', ['PersonalPages', 'Code'], 'ConfigurationSettings'))
+  #set ($ppSettingsRef = $services.model.createDocumentReference('', ['PersonalPages', 'Code'], 'Configuration'))
   #set ($ppSettingsObj = $xwiki.getDocumentAsAuthor($ppSettingsRef).getObject('PersonalPages.Code.ConfigurationClass'))
   #if ($ppSettingsObj)
     #if ("$!ppSettingsObj.getValue('location').trim()" != '')

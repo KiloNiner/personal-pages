@@ -110,6 +110,13 @@
           <contentPages>
             <contentPage>.*/PersonalPages/WebHome\.xml</contentPage>
           </contentPages>
+          <entries>
+            <!-- The settings: installed with the defaults, never touched by upgrades so administrators keep theirs. -->
+            <entry>
+              <document>PersonalPages.Code.Configuration</document>
+              <type>configuration</type>
+            </entry>
+          </entries>
         </configuration>
       </plugin>
     </plugins>

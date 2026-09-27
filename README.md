@@ -50,9 +50,15 @@ The shared logic lives in `PersonalPages.Code.Macros` (Velocity macros included 
 profile section). The bulk action runs on the hub page too, because administration section code cannot use macros
 from included pages.
 
-The settings are stored in `PersonalPages.Code.ConfigurationSettings`. That page is created by the administration
-form, is hidden, is readable by administrators only, and is **not** part of the extension, so installing, upgrading
-or re-importing the extension never resets them.
+The settings are stored on `PersonalPages.Code.Configuration`, edited with XWiki's standard administration form
+(`XWiki.ConfigurableClass`). The page is readable by administrators only, and it is declared as a `configuration`
+XAR entry in the POM: the Extension Manager installs it with the default settings and never touches it again on
+upgrades, so administrators keep their settings. (A manual re-import through Administration → Import ignores entry
+types and resets the settings to the defaults.)
+
+The shared logic lives in `PersonalPages.Code.Macros` (Velocity macros included by the hub, the drawer entry and the
+profile section). The bulk action runs on the hub page too, because administration section code cannot use macros
+from included pages.
 
 ### Implementation notes
 

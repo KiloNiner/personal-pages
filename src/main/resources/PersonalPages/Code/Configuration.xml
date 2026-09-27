@@ -31,7 +31,7 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>Personal Pages administration section</title>
+  <title>Personal Pages configuration</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -40,37 +40,138 @@
   <object>
     <name>PersonalPages.Code.Configuration</name>
     <number>0</number>
+    <className>PersonalPages.Code.ConfigurationClass</className>
+    <class>
+      <name>PersonalPages.Code.ConfigurationClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <location>
+        <cache>0</cache>
+        <classname/>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
+        <name>location</name>
+        <number>1</number>
+        <picker>1</picker>
+        <prettyName>Create personal pages under</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <size>30</size>
+        <sort>none</sort>
+        <sql/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
+      </location>
+      <readers>
+        <cache>0</cache>
+        <customDisplay/>
+        <defaultValue>loggedIn</defaultValue>
+        <disabled>0</disabled>
+        <displayType>radio</displayType>
+        <freeText>forbidden</freeText>
+        <hint/>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>readers</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Who can read new personal pages</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>loggedIn=All logged-in users|owner=Only the owner|groups=The owner and the groups below</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </readers>
+      <readerGroups>
+        <cache>0</cache>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <multiSelect>1</multiSelect>
+        <name>readerGroups</name>
+        <number>3</number>
+        <picker>1</picker>
+        <prettyName>Groups that can read new personal pages</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>20</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <usesList>1</usesList>
+        <classType>com.xpn.xwiki.objects.classes.GroupsClass</classType>
+      </readerGroups>
+      <ownerRights>
+        <cache>0</cache>
+        <customDisplay/>
+        <defaultValue>edit|delete</defaultValue>
+        <disabled>0</disabled>
+        <displayType>checkbox</displayType>
+        <freeText>forbidden</freeText>
+        <hint/>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>ownerRights</name>
+        <number>4</number>
+        <picker>0</picker>
+        <prettyName>What the owner can do</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>20</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>edit=Edit and create pages|comment=Comment|delete=Delete pages|admin=Administer (manage permissions)</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </ownerRights>
+    </class>
+    <property>
+      <location>PersonalPages.WebHome</location>
+    </property>
+    <property>
+      <ownerRights>edit|delete</ownerRights>
+    </property>
+    <property>
+      <readerGroups/>
+    </property>
+    <property>
+      <readers>loggedIn</readers>
+    </property>
+  </object>
+  <object>
+    <name>PersonalPages.Code.Configuration</name>
+    <number>1</number>
     <className>XWiki.ConfigurableClass</className>
     <property>
       <categoryIcon/>
     </property>
     <property>
       <codeToExecute>{{velocity}}
-#set ($settingsRef = $services.model.createDocumentReference('', ['PersonalPages', 'Code'], 'ConfigurationSettings'))
-#set ($settingsDoc = $xwiki.getDocument($settingsRef))
-#set ($settingsObj = $settingsDoc.getObject('PersonalPages.Code.ConfigurationClass'))
-#set ($location = 'PersonalPages.WebHome')
-#set ($readers = 'loggedIn')
-#set ($ownerRights = ['edit', 'delete'])
-#set ($groups = '')
-#if ($settingsObj)
-  #if ("$!settingsObj.getValue('location').trim()" != '')
-    #set ($location = $settingsObj.getValue('location').trim())
-  #end
-  #set ($readers = "$!settingsObj.getValue('readers')")
-  #set ($ownerRights = $settingsObj.getValue('ownerRights'))
-  #if ("$!ownerRights" != '' &amp;&amp; !$ownerRights.iterator())
-    #set ($ownerRights = $ownerRights.split('[,|]'))
-  #end
-  #set ($groups = "$!settingsObj.getValue('readerGroups')")
-#end
-#set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestUsersAndGroups.js', true))
-#set ($discard = $xwiki.ssfx.use('uicomponents/suggest/suggestUsersAndGroups.css', true))
-#set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPages.js', true))
-#set ($prefix = 'PersonalPages.Code.ConfigurationClass_0_')
-#set ($rights = 'XWiki.XWikiRights_0_')
-#set ($backURL = $xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section=PersonalPages'))
-##
+{{info}}$services.localization.render('personalpages.admin.appliesToNew'){{/info}}
+
 ## Result of the last batch of the bulk creation (the batches run on PersonalPages.WebHome, see there).
 #set ($bulkResult = $NULL)
 #if ("$!request.bulkProcessed" != '')
@@ -80,46 +181,6 @@
   #set ($bulkResult = {'processed': $bulkProcessed, 'total': $bulkTotal, 'created': "$!request.bulkCreated", 'existing': "$!request.bulkExisting", 'blocked': "$!request.bulkBlocked", 'done': $bulkDone})
 #end
 {{html clean="false"}}
-&lt;form method="post" action="$escapetool.xml($settingsDoc.getURL('save'))" class="xform"&gt;
-  &lt;input type="hidden" name="form_token" value="$escapetool.xml($services.csrf.token)"/&gt;
-  &lt;input type="hidden" name="xredirect" value="$escapetool.xml($backURL)"/&gt;
-  &lt;input type="hidden" name="objectPolicy" value="updateOrCreate"/&gt;
-  &lt;input type="hidden" name="parent" value="PersonalPages.Code.WebHome"/&gt;
-  &lt;input type="hidden" name="title" value="Personal Pages settings"/&gt;
-  &lt;input type="hidden" name="xhidden" value="1"/&gt;
-  &lt;input type="hidden" name="comment" value="$escapetool.xml($services.localization.render('personalpages.admin.saveComment'))"/&gt;
-  ## The settings page is readable by administrators only.
-  &lt;input type="hidden" name="${rights}groups" value="XWiki.XWikiAdminGroup"/&gt;
-  &lt;input type="hidden" name="${rights}users" value=""/&gt;
-  &lt;input type="hidden" name="${rights}levels" value="view"/&gt;
-  &lt;input type="hidden" name="${rights}allow" value="1"/&gt;
-  &lt;p&gt;$escapetool.xml($services.localization.render('personalpages.admin.appliesToNew'))&lt;/p&gt;
-  &lt;dl&gt;
-    &lt;dt&gt;&lt;label for="personalPagesLocation"&gt;$escapetool.xml($services.localization.render('personalpages.admin.location'))&lt;/label&gt;
-      &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('personalpages.admin.location.hint'))&lt;/span&gt;&lt;/dt&gt;
-    &lt;dd&gt;&lt;input type="text" id="personalPagesLocation" name="${prefix}location" class="suggest-pages" data-xwiki-selectize='{"maxItems": 1}' value="$escapetool.xml($location)"/&gt;&lt;/dd&gt;
-    &lt;dt&gt;&lt;label&gt;$escapetool.xml($services.localization.render('personalpages.admin.readers'))&lt;/label&gt;&lt;/dt&gt;
-    &lt;dd&gt;
-    #foreach ($option in ['loggedIn', 'owner', 'groups'])
-      &lt;label class="xwiki-form-listclass"&gt;&lt;input type="radio" name="${prefix}readers" value="$option" #if ($readers == $option || ($readers == '' &amp;&amp; $option == 'loggedIn'))checked="checked"#end/&gt;
-        $escapetool.xml($services.localization.render("personalpages.admin.readers.$option"))&lt;/label&gt;&lt;br/&gt;
-    #end
-    &lt;/dd&gt;
-    &lt;dt&gt;&lt;label for="personalPagesGroups"&gt;$escapetool.xml($services.localization.render('personalpages.admin.readerGroups'))&lt;/label&gt;
-      &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('personalpages.admin.readerGroups.hint'))&lt;/span&gt;&lt;/dt&gt;
-    &lt;dd&gt;&lt;input type="text" id="personalPagesGroups" name="${prefix}readerGroups" class="suggest-groups multipleSelection" value="$escapetool.xml($groups)"/&gt;&lt;/dd&gt;
-    &lt;dt&gt;&lt;label&gt;$escapetool.xml($services.localization.render('personalpages.admin.ownerRights'))&lt;/label&gt;
-      &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('personalpages.admin.ownerRights.hint'))&lt;/span&gt;&lt;/dt&gt;
-    &lt;dd&gt;
-      &lt;input type="hidden" name="${prefix}ownerRights" value=""/&gt;
-    #foreach ($right in ['edit', 'comment', 'delete', 'admin'])
-      &lt;label class="xwiki-form-listclass"&gt;&lt;input type="checkbox" name="${prefix}ownerRights" value="$right" #if ($ownerRights.contains($right))checked="checked"#end/&gt;
-        $escapetool.xml($services.localization.render("personalpages.admin.ownerRights.$right"))&lt;/label&gt;&lt;br/&gt;
-    #end
-    &lt;/dd&gt;
-  &lt;/dl&gt;
-  &lt;p&gt;&lt;input type="submit" class="btn btn-primary" value="$escapetool.xml($services.localization.render('save'))"/&gt;&lt;/p&gt;
-&lt;/form&gt;
 &lt;h2&gt;$escapetool.xml($services.localization.render('personalpages.admin.bulk.title'))&lt;/h2&gt;
 &lt;p&gt;$escapetool.xml($services.localization.render('personalpages.admin.bulk.hint'))&lt;/p&gt;
 #if ($bulkResult)
@@ -150,7 +211,7 @@
 {{/velocity}}</codeToExecute>
     </property>
     <property>
-      <configurationClass/>
+      <configurationClass>PersonalPages.Code.ConfigurationClass</configurationClass>
     </property>
     <property>
       <displayBeforeCategory/>
@@ -162,7 +223,7 @@
       <displayInSection>PersonalPages</displayInSection>
     </property>
     <property>
-      <heading>Personal Pages</heading>
+      <heading/>
     </property>
     <property>
       <iconAttachment/>
@@ -171,13 +232,30 @@
       <linkPrefix/>
     </property>
     <property>
-      <propertiesToShow/>
+      <propertiesToShow>location readers readerGroups ownerRights</propertiesToShow>
     </property>
     <property>
       <scope>WIKI</scope>
     </property>
     <property>
       <sectionOrder>900</sectionOrder>
+    </property>
+  </object>
+  <object>
+    <name>PersonalPages.Code.Configuration</name>
+    <number>2</number>
+    <className>XWiki.XWikiRights</className>
+    <property>
+      <allow>1</allow>
+    </property>
+    <property>
+      <groups>XWiki.XWikiAdminGroup</groups>
+    </property>
+    <property>
+      <levels>view</levels>
+    </property>
+    <property>
+      <users/>
     </property>
   </object>
 </xwikidoc>
