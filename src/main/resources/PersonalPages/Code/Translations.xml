@@ -1,0 +1,96 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="PersonalPages.Code.Translations" locale="">
+  <web>PersonalPages.Code</web>
+  <name>Translations</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>PersonalPages.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Personal Pages translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>personalpages.hub.intro.loggedIn=Personal pages for everyone. Each person gets their own pages: **everyone who is logged in can read them, only the owner can edit them.**
+personalpages.hub.intro.owner=Personal pages for everyone. Each person gets their own pages: **only the owner can see and edit them.**
+personalpages.hub.intro.groups=Personal pages for everyone. Each person gets their own pages: **only the owner can edit them, and selected groups can read them.**
+personalpages.hub.loginRequired=Log in to create or open your personal pages.
+personalpages.hub.yours=Your personal pages: {0}
+personalpages.hub.create=Create my personal page
+personalpages.hub.all=All personal pages
+personalpages.hub.blocked=Your personal page cannot be created because the page {0} already exists. Please ask an administrator.
+personalpages.hub.invalidRequest=The request could not be verified. Reload the page and try again.
+personalpages.list.owner=Owner
+personalpages.list.page=Page
+personalpages.list.location=Location
+personalpages.list.date=Last modified
+personalpages.page.title={0}
+personalpages.page.heading=Welcome
+personalpages.page.intro.loggedIn=These are my personal pages. Everyone who is logged in can read them; only I can edit them.
+personalpages.page.intro.owner=These are my personal pages. Only I can see and edit them.
+personalpages.page.intro.groups=These are my personal pages. Only I can edit them; selected groups can read them.
+personalpages.drawer.myPages=My pages
+personalpages.profile.menu=Personal pages
+personalpages.profile.title=Personal pages
+personalpages.profile.none=This user has no personal pages that you can see.
+personalpages.profile.noneOwn=You have no personal pages yet. {0}
+personalpages.save.rights=Personal pages rights
+personalpages.save.created=Personal page created
+personalpages.save.createdByAdmin=Personal page created by an administrator
+admin.personalpages=Personal Pages
+admin.personalpages.description=Where personal pages are created and who can access new ones.
+personalpages.admin.appliesToNew=These settings apply to personal pages created from now on. Existing personal pages stay where they are and keep their permissions; administrators can always see everything.
+personalpages.admin.location=Create personal pages under
+personalpages.admin.location.hint=New personal pages become children of this page. Defaults to the Personal Pages page.
+personalpages.admin.readers=Who can read new personal pages
+personalpages.admin.readers.loggedIn=All logged-in users
+personalpages.admin.readers.owner=Only the owner
+personalpages.admin.readers.groups=The owner and the groups below
+personalpages.admin.readerGroups=Groups that can read new personal pages
+personalpages.admin.readerGroups.hint=Only used when "The owner and the groups below" is selected.
+personalpages.admin.ownerRights=What the owner can do
+personalpages.admin.ownerRights.hint=Granting Comment means only the owner can comment on their pages. Administer lets owners change the permissions of their own pages. If nothing is ticked, owners get Edit and Delete.
+personalpages.admin.ownerRights.edit=Edit and create pages
+personalpages.admin.ownerRights.comment=Comment
+personalpages.admin.ownerRights.delete=Delete pages
+personalpages.admin.ownerRights.admin=Administer (manage permissions)
+personalpages.admin.saveComment=Personal Pages settings updated
+personalpages.admin.bulk.title=Create personal pages for existing users
+personalpages.admin.bulk.hint=Creates personal pages, with the settings above, for every active user of this wiki who does not have them yet. Users who already have personal pages are skipped. The pages are created by you, in batches.
+personalpages.admin.bulk.button=Create missing personal pages
+personalpages.admin.bulk.progress=Processed {0} of {1} users: {2} personal pages created, {3} users already had them.
+personalpages.admin.bulk.blocked=Not created because a page is in the way (up to 20 listed): {0}</content>
+  <object>
+    <name>PersonalPages.Code.Translations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <property>
+      <scope>WIKI</scope>
+    </property>
+  </object>
+</xwikidoc>

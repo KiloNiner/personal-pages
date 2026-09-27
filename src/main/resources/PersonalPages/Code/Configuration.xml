@@ -1,0 +1,183 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="PersonalPages.Code.Configuration" locale="">
+  <web>PersonalPages.Code</web>
+  <name>Configuration</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>PersonalPages.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Personal Pages administration section</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content/>
+  <object>
+    <name>PersonalPages.Code.Configuration</name>
+    <number>0</number>
+    <className>XWiki.ConfigurableClass</className>
+    <property>
+      <categoryIcon/>
+    </property>
+    <property>
+      <codeToExecute>{{velocity}}
+#set ($settingsRef = $services.model.createDocumentReference('', ['PersonalPages', 'Code'], 'ConfigurationSettings'))
+#set ($settingsDoc = $xwiki.getDocument($settingsRef))
+#set ($settingsObj = $settingsDoc.getObject('PersonalPages.Code.ConfigurationClass'))
+#set ($location = 'PersonalPages.WebHome')
+#set ($readers = 'loggedIn')
+#set ($ownerRights = ['edit', 'delete'])
+#set ($groups = '')
+#if ($settingsObj)
+  #if ("$!settingsObj.getValue('location').trim()" != '')
+    #set ($location = $settingsObj.getValue('location').trim())
+  #end
+  #set ($readers = "$!settingsObj.getValue('readers')")
+  #set ($ownerRights = $settingsObj.getValue('ownerRights'))
+  #if ("$!ownerRights" != '' &amp;&amp; !$ownerRights.iterator())
+    #set ($ownerRights = $ownerRights.split('[,|]'))
+  #end
+  #set ($groups = "$!settingsObj.getValue('readerGroups')")
+#end
+#set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestUsersAndGroups.js', true))
+#set ($discard = $xwiki.ssfx.use('uicomponents/suggest/suggestUsersAndGroups.css', true))
+#set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPages.js', true))
+#set ($prefix = 'PersonalPages.Code.ConfigurationClass_0_')
+#set ($rights = 'XWiki.XWikiRights_0_')
+#set ($backURL = $xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section=PersonalPages'))
+##
+## Result of the last batch of the bulk creation (the batches run on PersonalPages.WebHome, see there).
+#set ($bulkResult = $NULL)
+#if ("$!request.bulkProcessed" != '')
+  #set ($bulkProcessed = $numbertool.toNumber($request.bulkProcessed).intValue())
+  #set ($bulkTotal = $numbertool.toNumber($request.bulkTotal).intValue())
+  #set ($bulkDone = $bulkProcessed &gt;= $bulkTotal)
+  #set ($bulkResult = {'processed': $bulkProcessed, 'total': $bulkTotal, 'created': "$!request.bulkCreated", 'existing': "$!request.bulkExisting", 'blocked': "$!request.bulkBlocked", 'done': $bulkDone})
+#end
+{{html clean="false"}}
+&lt;form method="post" action="$escapetool.xml($settingsDoc.getURL('save'))" class="xform"&gt;
+  &lt;input type="hidden" name="form_token" value="$escapetool.xml($services.csrf.token)"/&gt;
+  &lt;input type="hidden" name="xredirect" value="$escapetool.xml($backURL)"/&gt;
+  &lt;input type="hidden" name="objectPolicy" value="updateOrCreate"/&gt;
+  &lt;input type="hidden" name="parent" value="PersonalPages.Code.WebHome"/&gt;
+  &lt;input type="hidden" name="title" value="Personal Pages settings"/&gt;
+  &lt;input type="hidden" name="xhidden" value="1"/&gt;
+  &lt;input type="hidden" name="comment" value="$escapetool.xml($services.localization.render('personalpages.admin.saveComment'))"/&gt;
+  ## The settings page is readable by administrators only.
+  &lt;input type="hidden" name="${rights}groups" value="XWiki.XWikiAdminGroup"/&gt;
+  &lt;input type="hidden" name="${rights}users" value=""/&gt;
+  &lt;input type="hidden" name="${rights}levels" value="view"/&gt;
+  &lt;input type="hidden" name="${rights}allow" value="1"/&gt;
+  &lt;p&gt;$escapetool.xml($services.localization.render('personalpages.admin.appliesToNew'))&lt;/p&gt;
+  &lt;dl&gt;
+    &lt;dt&gt;&lt;label for="personalPagesLocation"&gt;$escapetool.xml($services.localization.render('personalpages.admin.location'))&lt;/label&gt;
+      &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('personalpages.admin.location.hint'))&lt;/span&gt;&lt;/dt&gt;
+    &lt;dd&gt;&lt;input type="text" id="personalPagesLocation" name="${prefix}location" class="suggest-pages" data-xwiki-selectize='{"maxItems": 1}' value="$escapetool.xml($location)"/&gt;&lt;/dd&gt;
+    &lt;dt&gt;&lt;label&gt;$escapetool.xml($services.localization.render('personalpages.admin.readers'))&lt;/label&gt;&lt;/dt&gt;
+    &lt;dd&gt;
+    #foreach ($option in ['loggedIn', 'owner', 'groups'])
+      &lt;label class="xwiki-form-listclass"&gt;&lt;input type="radio" name="${prefix}readers" value="$option" #if ($readers == $option || ($readers == '' &amp;&amp; $option == 'loggedIn'))checked="checked"#end/&gt;
+        $escapetool.xml($services.localization.render("personalpages.admin.readers.$option"))&lt;/label&gt;&lt;br/&gt;
+    #end
+    &lt;/dd&gt;
+    &lt;dt&gt;&lt;label for="personalPagesGroups"&gt;$escapetool.xml($services.localization.render('personalpages.admin.readerGroups'))&lt;/label&gt;
+      &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('personalpages.admin.readerGroups.hint'))&lt;/span&gt;&lt;/dt&gt;
+    &lt;dd&gt;&lt;input type="text" id="personalPagesGroups" name="${prefix}readerGroups" class="suggest-groups multipleSelection" value="$escapetool.xml($groups)"/&gt;&lt;/dd&gt;
+    &lt;dt&gt;&lt;label&gt;$escapetool.xml($services.localization.render('personalpages.admin.ownerRights'))&lt;/label&gt;
+      &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('personalpages.admin.ownerRights.hint'))&lt;/span&gt;&lt;/dt&gt;
+    &lt;dd&gt;
+      &lt;input type="hidden" name="${prefix}ownerRights" value=""/&gt;
+    #foreach ($right in ['edit', 'comment', 'delete', 'admin'])
+      &lt;label class="xwiki-form-listclass"&gt;&lt;input type="checkbox" name="${prefix}ownerRights" value="$right" #if ($ownerRights.contains($right))checked="checked"#end/&gt;
+        $escapetool.xml($services.localization.render("personalpages.admin.ownerRights.$right"))&lt;/label&gt;&lt;br/&gt;
+    #end
+    &lt;/dd&gt;
+  &lt;/dl&gt;
+  &lt;p&gt;&lt;input type="submit" class="btn btn-primary" value="$escapetool.xml($services.localization.render('save'))"/&gt;&lt;/p&gt;
+&lt;/form&gt;
+&lt;h2&gt;$escapetool.xml($services.localization.render('personalpages.admin.bulk.title'))&lt;/h2&gt;
+&lt;p&gt;$escapetool.xml($services.localization.render('personalpages.admin.bulk.hint'))&lt;/p&gt;
+#if ($bulkResult)
+  &lt;div class="box #if ($bulkResult.done)successmessage#{else}infomessage#end" id="personalPagesBulkResult"
+    data-processed="$bulkResult.processed" data-total="$bulkResult.total" data-created="$escapetool.xml($bulkResult.created)"
+    data-existing="$escapetool.xml($bulkResult.existing)" data-done="$bulkResult.done"&gt;
+    $escapetool.xml($services.localization.render('personalpages.admin.bulk.progress', [$bulkResult.processed, $bulkResult.total, $bulkResult.created, $bulkResult.existing]))
+    #if ($bulkResult.blocked != '')
+      &lt;br/&gt;$escapetool.xml($services.localization.render('personalpages.admin.bulk.blocked', [$bulkResult.blocked]))
+    #end
+  &lt;/div&gt;
+#end
+&lt;form method="post" action="$escapetool.xml($xwiki.getURL('PersonalPages.WebHome'))" id="personalPagesBulkForm"&gt;
+  &lt;input type="hidden" name="form_token" value="$escapetool.xml($services.csrf.token)"/&gt;
+  &lt;input type="hidden" name="action" value="createAll"/&gt;
+  &lt;input type="hidden" name="start" value="#if ($bulkResult &amp;&amp; !$bulkResult.done)$bulkResult.processed#{else}0#end"/&gt;
+  #if ($bulkResult &amp;&amp; !$bulkResult.done)
+  &lt;input type="hidden" name="created" value="$escapetool.xml($bulkResult.created)"/&gt;
+  &lt;input type="hidden" name="existing" value="$escapetool.xml($bulkResult.existing)"/&gt;
+  #end
+  &lt;p&gt;&lt;input type="submit" class="btn btn-default" value="$escapetool.xml($services.localization.render('personalpages.admin.bulk.button'))"/&gt;&lt;/p&gt;
+&lt;/form&gt;
+#if ($bulkResult &amp;&amp; !$bulkResult.done)
+  ## Continue with the next batch automatically.
+  &lt;script&gt;document.getElementById('personalPagesBulkForm').submit();&lt;/script&gt;
+#end
+{{/html}}
+{{/velocity}}</codeToExecute>
+    </property>
+    <property>
+      <configurationClass/>
+    </property>
+    <property>
+      <displayBeforeCategory/>
+    </property>
+    <property>
+      <displayInCategory>usersgroups</displayInCategory>
+    </property>
+    <property>
+      <displayInSection>PersonalPages</displayInSection>
+    </property>
+    <property>
+      <heading>Personal Pages</heading>
+    </property>
+    <property>
+      <iconAttachment/>
+    </property>
+    <property>
+      <linkPrefix/>
+    </property>
+    <property>
+      <propertiesToShow/>
+    </property>
+    <property>
+      <scope>WIKI</scope>
+    </property>
+    <property>
+      <sectionOrder>900</sectionOrder>
+    </property>
+  </object>
+</xwikidoc>

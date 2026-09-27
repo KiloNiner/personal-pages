@@ -1,0 +1,136 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="PersonalPages.Code.ConfigurationClass" locale="">
+  <web>PersonalPages.Code</web>
+  <name>ConfigurationClass</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>PersonalPages.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Personal Pages configuration class</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content/>
+  <class>
+    <name>PersonalPages.Code.ConfigurationClass</name>
+    <customClass/>
+    <customMapping/>
+    <defaultViewSheet/>
+    <defaultEditSheet/>
+    <defaultWeb/>
+    <nameField/>
+    <validationScript/>
+    <location>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <hint>Reference of the page under which new personal pages are created. Defaults to PersonalPages.WebHome.</hint>
+      <name>location</name>
+      <number>1</number>
+      <picker>0</picker>
+      <prettyName>Create personal pages under</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </location>
+    <readers>
+      <cache>0</cache>
+      <customDisplay/>
+      <defaultValue>loggedIn</defaultValue>
+      <disabled>0</disabled>
+      <displayType>radio</displayType>
+      <freeText>forbidden</freeText>
+      <hint/>
+      <largeStorage>0</largeStorage>
+      <multiSelect>0</multiSelect>
+      <name>readers</name>
+      <number>2</number>
+      <picker>0</picker>
+      <prettyName>Who can read new personal pages</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators>|, </separators>
+      <size>1</size>
+      <sort>none</sort>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <values>loggedIn=All logged-in users|owner=Only the owner|groups=The owner and the groups below</values>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+    </readers>
+    <readerGroups>
+      <cache>0</cache>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <displayType>input</displayType>
+      <hint/>
+      <multiSelect>1</multiSelect>
+      <name>readerGroups</name>
+      <number>3</number>
+      <picker>1</picker>
+      <prettyName>Groups that can read new personal pages</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators>|, </separators>
+      <size>20</size>
+      <sort>none</sort>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <usesList>1</usesList>
+      <classType>com.xpn.xwiki.objects.classes.GroupsClass</classType>
+    </readerGroups>
+    <ownerRights>
+      <cache>0</cache>
+      <customDisplay/>
+      <defaultValue>edit|delete</defaultValue>
+      <disabled>0</disabled>
+      <displayType>checkbox</displayType>
+      <freeText>forbidden</freeText>
+      <hint/>
+      <largeStorage>0</largeStorage>
+      <multiSelect>1</multiSelect>
+      <name>ownerRights</name>
+      <number>4</number>
+      <picker>0</picker>
+      <prettyName>What the owner can do</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators>|, </separators>
+      <size>20</size>
+      <sort>none</sort>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <values>edit=Edit and create pages|comment=Comment|delete=Delete pages|admin=Administer (manage permissions)</values>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+    </ownerRights>
+  </class>
+</xwikidoc>

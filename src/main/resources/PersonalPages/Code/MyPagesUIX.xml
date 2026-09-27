@@ -1,0 +1,82 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="PersonalPages.Code.MyPagesUIX" locale="">
+  <web>PersonalPages.Code</web>
+  <name>MyPagesUIX</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>PersonalPages.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>My pages drawer entry</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content/>
+  <object>
+    <name>PersonalPages.Code.MyPagesUIX</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content>{{include reference="PersonalPages.Code.Macros"/}}
+
+{{velocity}}{{html clean="false"}}
+  #if ($xcontext.userReference)
+    #ppFindPages($xcontext.userReference)
+    #if ($ppFound)
+      #set ($target = $ppFound)
+    #else
+      #set ($target = $services.model.createDocumentReference('', 'PersonalPages', 'WebHome'))
+    #end
+    #template('drawer_macros.vm')
+    #drawerItem($xwiki.getURL($target), 'home', $escapetool.xml($services.localization.render('personalpages.drawer.myPages')), 'tmMyPages')
+  #end
+{{/html}}{{/velocity}}</content>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.plaftorm.drawer</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.contrib.personalpages.drawer.mypages</name>
+    </property>
+    <property>
+      <parameters>order=45000</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+</xwikidoc>

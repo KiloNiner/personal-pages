@@ -1,0 +1,206 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="PersonalPages.Code.Macros" locale="">
+  <web>PersonalPages.Code</web>
+  <name>Macros</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>PersonalPages.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Personal Pages macros</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+## Shared code of the Personal Pages application, included by the hub, the "My pages" drawer entry, the user profile
+## section and the administration section. Variables set by these macros are prefixed with "pp".
+
+## Loads the administration settings into $ppLocation, $ppLocationRef, $ppParentSpaces, $ppReaders, $ppOwnerRights and
+## $ppReaderGroups. The settings page is readable by administrators only, hence getDocumentAsAuthor.
+#macro (ppLoadSettings)
+  #set ($ppLocation = 'PersonalPages.WebHome')
+  #set ($ppReaders = 'loggedIn')
+  #set ($ppOwnerRights = ['edit', 'delete'])
+  #set ($ppReaderGroups = [])
+  #set ($ppSettingsRef = $services.model.createDocumentReference('', ['PersonalPages', 'Code'], 'ConfigurationSettings'))
+  #set ($ppSettingsObj = $xwiki.getDocumentAsAuthor($ppSettingsRef).getObject('PersonalPages.Code.ConfigurationClass'))
+  #if ($ppSettingsObj)
+    #if ("$!ppSettingsObj.getValue('location').trim()" != '')
+      #set ($ppLocation = $ppSettingsObj.getValue('location').trim())
+    #end
+    #set ($ppConfiguredReaders = "$!ppSettingsObj.getValue('readers')")
+    #if ($ppConfiguredReaders == 'owner' || $ppConfiguredReaders == 'groups')
+      #set ($ppReaders = $ppConfiguredReaders)
+    #end
+    ## Only known right names are accepted; list values may come back as a list or as a separated string.
+    #set ($ppRawRights = $ppSettingsObj.getValue('ownerRights'))
+    #if ("$!ppRawRights" != '' &amp;&amp; !$ppRawRights.iterator())
+      #set ($ppRawRights = $ppRawRights.split('[,|]'))
+    #end
+    #set ($ppKnownRights = ['edit', 'comment', 'delete', 'admin'])
+    #set ($ppConfiguredRights = [])
+    #foreach ($ppRight in $ppRawRights)
+      #set ($ppRight = $ppRight.trim())
+      #if ($ppKnownRights.contains($ppRight) &amp;&amp; !$ppConfiguredRights.contains($ppRight))
+        #set ($discard = $ppConfiguredRights.add($ppRight))
+      #end
+    #end
+    #if (!$ppConfiguredRights.isEmpty())
+      #set ($ppOwnerRights = $ppConfiguredRights)
+    #end
+    #set ($ppRawGroups = $ppSettingsObj.getValue('readerGroups'))
+    #if ("$!ppRawGroups" != '' &amp;&amp; !$ppRawGroups.iterator())
+      #set ($ppRawGroups = $ppRawGroups.split('[,|]'))
+    #end
+    #foreach ($ppGroup in $ppRawGroups)
+      #if ("$!ppGroup.trim()" != '')
+        #set ($discard = $ppReaderGroups.add($ppGroup.trim()))
+      #end
+    #end
+  #end
+  ## New personal pages are children of the location page: under its space for a WebHome, under the page otherwise.
+  #set ($ppLocationRef = $services.model.resolveDocument($ppLocation))
+  #set ($ppParentSpaces = [])
+  #foreach ($ppSpaceRef in $ppLocationRef.spaceReferences)
+    #set ($discard = $ppParentSpaces.add($ppSpaceRef.name))
+  #end
+  #if ($ppLocationRef.name != 'WebHome')
+    #set ($discard = $ppParentSpaces.add($ppLocationRef.name))
+  #end
+#end
+
+## A user as stored in rights rules and markers: "XWiki.bob" for a user of this wiki, "xwiki:XWiki.bob" for a user of
+## another wiki (e.g. a main-wiki user in a subwiki). Sets $ppUserString.
+#macro (ppUserString $ppUserRef)
+  #set ($ppUserString = $services.model.serialize($ppUserRef, 'compactwiki'))
+#end
+
+## Where the personal pages of a user are created with the current settings. Sets $ppHomeRef and $ppHomeSpaces.
+#macro (ppHomeRef $ppUserRef)
+  #set ($ppHomeSpaces = [])
+  #set ($discard = $ppHomeSpaces.addAll($ppParentSpaces))
+  #set ($discard = $ppHomeSpaces.add($ppUserRef.name))
+  #set ($ppHomeRef = $services.model.createDocumentReference('', $ppHomeSpaces, 'WebHome'))
+#end
+
+## Finds the personal pages of a user, wherever they were created. Sets $ppFound (a document reference) or null.
+## A page only counts when its creator is the user (created with the button) or an administrator (created by the
+## administration action): users can edit the marker on their own pages, but they cannot change who created a page.
+#macro (ppFindPages $ppUserRef)
+  #set ($ppFound = $NULL)
+  #ppUserString($ppUserRef)
+  #set ($ppCandidates = $services.query.xwql('from doc.object(PersonalPages.Code.PersonalPageClass) as marker where marker.owner = :owner').bindValue('owner', $ppUserString).setLimit(20).execute())
+  #foreach ($ppCandidate in $ppCandidates)
+    #if (!$ppFound)
+      #set ($ppCandidateDoc = $xwiki.getDocumentAsAuthor($ppCandidate))
+      #set ($ppCreatorRef = $ppCandidateDoc.creatorReference)
+      #if ($ppCreatorRef == $ppUserRef || $services.security.authorization.hasAccess('admin', $ppCreatorRef, $services.wiki.currentWikiReference))
+        #set ($ppFound = $ppCandidateDoc.documentReference)
+      #end
+    #end
+  #end
+#end
+
+## Creates the personal pages of a user (call #ppLoadSettings first). With $ppAsUser the home page is saved as the
+## current user (the button); otherwise as the script author, an administrator (the administration action).
+## Sets $ppCreated (the home page reference) or $ppBlocked (the page that is in the way).
+#macro (ppCreate $ppUserRef $ppAsUser)
+  #set ($ppCreated = $NULL)
+  #set ($ppBlocked = $NULL)
+  #ppUserString($ppUserRef)
+  #ppHomeRef($ppUserRef)
+  #if (!$xwiki.getDocumentAsAuthor($ppHomeRef).isNew())
+    #set ($ppBlocked = $ppHomeRef)
+  #else
+    ## 1. Rights, saved as the script author because users cannot edit rights themselves. Read access is granted
+    ##    explicitly (never inherited), so personal pages do not depend on the permissions of the location page.
+    ##    Levels are stored without spaces ("view,edit"): the rights checker does not trim them.
+    #set ($ppLevels = [])
+    #if ($ppReaders != 'loggedIn')
+      #set ($discard = $ppLevels.add('view'))
+    #end
+    #set ($discard = $ppLevels.addAll($ppOwnerRights))
+    #set ($ppReaderRuleGroups = [])
+    #if ($ppReaders == 'loggedIn')
+      #set ($discard = $ppReaderRuleGroups.add('XWiki.XWikiAllGroup'))
+      ## In a subwiki, users of the main wiki are not members of the subwiki's XWikiAllGroup.
+      #if ($services.wiki.currentWikiId != $services.wiki.mainWikiId)
+        #set ($discard = $ppReaderRuleGroups.add("${services.wiki.mainWikiId}:XWiki.XWikiAllGroup"))
+      #end
+    #elseif ($ppReaders == 'groups')
+      #set ($discard = $ppReaderRuleGroups.addAll($ppReaderGroups))
+    #end
+    #set ($ppPrefsRef = $services.model.createDocumentReference('', $ppHomeSpaces, 'WebPreferences'))
+    #set ($ppPrefs = $xwiki.getDocumentAsAuthor($ppPrefsRef))
+    ## Replace (never add to) existing rules, so a retry after a failed attempt cannot leave duplicates.
+    #set ($discard = $ppPrefs.removeObjects('XWiki.XWikiGlobalRights'))
+    #set ($ppOwnerRule = $ppPrefs.newObject('XWiki.XWikiGlobalRights'))
+    #set ($discard = $ppOwnerRule.set('users', $ppUserString))
+    #set ($discard = $ppOwnerRule.set('groups', ''))
+    #set ($discard = $ppOwnerRule.set('levels', $stringtool.join($ppLevels, ',')))
+    #set ($discard = $ppOwnerRule.set('allow', 1))
+    #if (!$ppReaderRuleGroups.isEmpty())
+      #set ($ppReaderRule = $ppPrefs.newObject('XWiki.XWikiGlobalRights'))
+      #set ($discard = $ppReaderRule.set('users', ''))
+      #set ($discard = $ppReaderRule.set('groups', $stringtool.join($ppReaderRuleGroups, ',')))
+      #set ($discard = $ppReaderRule.set('levels', 'view'))
+      #set ($discard = $ppReaderRule.set('allow', 1))
+    #end
+    #set ($discard = $ppPrefs.setHidden(true))
+    #set ($discard = $ppPrefs.saveAsAuthor($services.localization.render('personalpages.save.rights')))
+    ## 2. The home page. Fetched only now: the rights saved above are what let the user see and edit it.
+    #if ($ppAsUser)
+      #set ($ppHomeDoc = $xwiki.getDocument($ppHomeRef))
+    #else
+      #set ($ppHomeDoc = $xwiki.getDocumentAsAuthor($ppHomeRef))
+    #end
+    #set ($ppNl = $util.newline)
+    ## The welcome texts come from the admin-controlled translations and are inserted as wiki markup.
+    #set ($ppHeading = $services.localization.render('personalpages.page.heading'))
+    #set ($ppIntro = $services.localization.render("personalpages.page.intro.$ppReaders"))
+    #set ($discard = $ppHomeDoc.setTitle($services.localization.render('personalpages.page.title', [$xwiki.getPlainUserName($ppUserRef)])))
+    #set ($discard = $ppHomeDoc.setSyntaxId('xwiki/2.1'))
+    #set ($discard = $ppHomeDoc.setContent("= $ppHeading =$ppNl$ppNl$ppIntro$ppNl$ppNl{{children/}}$ppNl"))
+    #set ($ppMarker = $ppHomeDoc.newObject('PersonalPages.Code.PersonalPageClass'))
+    #set ($discard = $ppMarker.set('owner', $ppUserString))
+    #if ($ppAsUser)
+      #set ($discard = $ppHomeDoc.save($services.localization.render('personalpages.save.created')))
+    #else
+      #set ($discard = $ppHomeDoc.saveAsAuthor($services.localization.render('personalpages.save.createdByAdmin')))
+    #end
+    #set ($ppCreated = $ppHomeRef)
+  #end
+#end
+
+## A wiki link to a document, safe for any title or reference. Sets $ppLink.
+#macro (ppLink $ppLinkRef)
+  #set ($ppLinkDoc = $xwiki.getDocument($ppLinkRef))
+  #set ($ppLink = "[[$services.rendering.escape($ppLinkDoc.plainTitle, 'xwiki/2.1')&gt;&gt;doc:$services.rendering.escape($services.model.serialize($ppLinkRef, 'local'), 'xwiki/2.1')]]")
+#end
+{{/velocity}}</content>
+</xwikidoc>

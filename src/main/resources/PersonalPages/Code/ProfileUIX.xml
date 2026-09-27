@@ -1,0 +1,90 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="PersonalPages.Code.ProfileUIX" locale="">
+  <web>PersonalPages.Code</web>
+  <name>ProfileUIX</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>PersonalPages.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Personal pages section of the user profile</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content/>
+  <object>
+    <name>PersonalPages.Code.ProfileUIX</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content>{{include reference="PersonalPages.Code.Macros"/}}
+
+{{velocity}}
+(% id="HPersonalPages" %)
+== $services.localization.render('personalpages.profile.title') ==
+
+#set ($profileUserRef = $doc.documentReference)
+#set ($isOwnProfile = $xcontext.userReference == $profileUserRef)
+#ppFindPages($profileUserRef)
+#if ($ppFound &amp;&amp; $services.security.authorization.hasAccess('view', $ppFound))
+  #ppLink($ppFound)
+  $ppLink
+
+  {{documentTree root="document:$services.rendering.escape($services.model.serialize($ppFound, 'default'), 'xwiki/2.1')" showRoot="false" /}}
+#elseif ($isOwnProfile)
+  $services.localization.render('personalpages.profile.noneOwn', ["[[$services.localization.render('personalpages.hub.create')&gt;&gt;doc:PersonalPages.WebHome]]"])
+#else
+  $services.localization.render('personalpages.profile.none')
+#end
+{{/velocity}}</content>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.plaftorm.user.profile.menu</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.contrib.personalpages.profile</name>
+    </property>
+    <property>
+      <parameters>icon=home
+name=$services.localization.render('personalpages.profile.menu')
+priority=900</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+</xwikidoc>

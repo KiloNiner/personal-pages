@@ -1,0 +1,154 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="PersonalPages.WebHome" locale="">
+  <web>PersonalPages</web>
+  <name>WebHome</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Personal Pages</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <content>{{include reference="PersonalPages.Code.Macros"/}}
+
+{{velocity}}
+#ppLoadSettings()
+#set ($isGuest = $xcontext.userReference == $NULL)
+#if (!$isGuest)
+  #ppFindPages($xcontext.userReference)
+  #set ($ownRef = $ppFound)
+  #ppHomeRef($xcontext.userReference)
+  ## Someone else's page (or an unrelated page) already sits where this user's personal pages would go.
+  #set ($blocked = !$ownRef &amp;&amp; !$xwiki.getDocumentAsAuthor($ppHomeRef).isNew())
+#end
+#if (!$isGuest &amp;&amp; $request.method == 'POST' &amp;&amp; "$!request.action" == 'create')
+  #if (!$services.csrf.isTokenValid($request.form_token))
+    {{error}}$services.localization.render('personalpages.hub.invalidRequest'){{/error}}
+  #elseif ($ownRef)
+    $response.sendRedirect($xwiki.getURL($ownRef))
+    #stop
+  #elseif (!$blocked)
+    #ppCreate($xcontext.userReference true)
+    #if ($ppCreated)
+      $response.sendRedirect($xwiki.getURL($ppCreated))
+      #stop
+    #end
+  #end
+#end
+## Bulk creation, started from Administration &gt; Users &amp; Rights &gt; Personal Pages. It runs here rather than in the
+## administration section because the shared macros cannot be used from administration section code.
+#if (!$isGuest &amp;&amp; $request.method == 'POST' &amp;&amp; "$!request.action" == 'createAll')
+  #if (!$services.csrf.isTokenValid($request.form_token) || !$services.security.authorization.hasAccess('admin', $services.wiki.currentWikiReference))
+    {{error}}$services.localization.render('personalpages.hub.invalidRequest'){{/error}}
+  #else
+    #set ($bulkStart = $numbertool.toNumber("$!request.start"))
+    #if (!$bulkStart || $bulkStart.intValue() &lt; 0)
+      #set ($bulkStart = 0)
+    #else
+      #set ($bulkStart = $bulkStart.intValue())
+    #end
+    #set ($bulkStatement = 'from doc.object(XWiki.XWikiUsers) as user where user.active = 1 order by doc.fullName')
+    #set ($bulkTotal = $services.query.xwql($bulkStatement).count())
+    #set ($bulkUsers = $services.query.xwql($bulkStatement).setOffset($bulkStart).setLimit(50).execute())
+    ## Running totals over all batches of this run.
+    #set ($bulkCreated = 0)
+    #set ($bulkPrevious = $numbertool.toNumber("$!request.created"))
+    #if ($bulkPrevious &amp;&amp; $bulkPrevious.intValue() &gt; 0)
+      #set ($bulkCreated = $bulkPrevious.intValue())
+    #end
+    #set ($bulkExisting = 0)
+    #set ($bulkPrevious = $numbertool.toNumber("$!request.existing"))
+    #if ($bulkPrevious &amp;&amp; $bulkPrevious.intValue() &gt; 0)
+      #set ($bulkExisting = $bulkPrevious.intValue())
+    #end
+    #set ($bulkBlocked = [])
+    #foreach ($bulkUserName in $bulkUsers)
+      #set ($bulkUserRef = $services.model.resolveDocument($bulkUserName))
+      #ppFindPages($bulkUserRef)
+      #if ($ppFound)
+        #set ($bulkExisting = $bulkExisting + 1)
+      #else
+        #ppCreate($bulkUserRef false)
+        #if ($ppCreated)
+          #set ($bulkCreated = $bulkCreated + 1)
+        #elseif ($ppBlocked &amp;&amp; $bulkBlocked.size() &lt; 20)
+          #set ($discard = $bulkBlocked.add($services.model.serialize($ppBlocked, 'local')))
+        #end
+      #end
+    #end
+    #set ($bulkProcessed = $bulkStart + $bulkUsers.size())
+    #set ($bulkQuery = $escapetool.url({
+      'section': 'PersonalPages',
+      'bulkProcessed': $bulkProcessed,
+      'bulkTotal': $bulkTotal,
+      'bulkCreated': $bulkCreated,
+      'bulkExisting': $bulkExisting,
+      'bulkBlocked': $stringtool.join($bulkBlocked, ', ')
+    }))
+    $response.sendRedirect($xwiki.getURL('XWiki.XWikiPreferences', 'admin', $bulkQuery))
+    #stop
+  #end
+#end
+$services.localization.render("personalpages.hub.intro.$ppReaders")
+
+#if ($isGuest)
+  {{info}}$services.localization.render('personalpages.hub.loginRequired'){{/info}}
+#elseif ($ownRef)
+  #ppLink($ownRef)
+  {{info}}$services.localization.render('personalpages.hub.yours', [$ppLink]){{/info}}
+#elseif ($blocked)
+  {{warning}}$services.localization.render('personalpages.hub.blocked', [$services.model.serialize($ppHomeRef, 'local')]){{/warning}}
+#else
+  {{html clean="false"}}
+  &lt;form method="post" action="$escapetool.xml($doc.getURL())"&gt;
+    &lt;input type="hidden" name="form_token" value="$escapetool.xml($services.csrf.token)"/&gt;
+    &lt;input type="hidden" name="action" value="create"/&gt;
+    &lt;button type="submit" class="btn btn-primary"&gt;$escapetool.xml($services.localization.render('personalpages.hub.create'))&lt;/button&gt;
+  &lt;/form&gt;
+  {{/html}}
+#end
+
+== $services.localization.render('personalpages.hub.all') ==
+
+## Listed by their marker, so personal pages created under an earlier location are included too. Rows are filtered
+## by the viewer's rights.
+#set ($liveDataConfig = {
+  'meta': {
+    'propertyDescriptors': [
+      {'id': 'owner', 'name': $services.localization.render('personalpages.list.owner'), 'sortable': true, 'filterable': true},
+      {'id': 'doc.title', 'name': $services.localization.render('personalpages.list.page'), 'sortable': true, 'filterable': true},
+      {'id': 'doc.location', 'name': $services.localization.render('personalpages.list.location'), 'sortable': false, 'filterable': false},
+      {'id': 'doc.date', 'name': $services.localization.render('personalpages.list.date'), 'sortable': true, 'filterable': false}
+    ]
+  }
+})
+{{liveData id="personalPages" source="liveTable" sourceParameters="className=PersonalPages.Code.PersonalPageClass" properties="owner,doc.title,doc.location,doc.date" sort="doc.title:asc" limit="25"}}$jsontool.serialize($liveDataConfig){{/liveData}}
+{{/velocity}}</content>
+</xwikidoc>
