@@ -13,7 +13,7 @@ Users create their own pages with one click; administrators choose where they ar
 * License: LGPL 2.1
 * Translations: N/A
 * Sonar Dashboard: N/A
-* Continuous Integration Status: N/A
+* Continuous Integration Status: [![Build](https://github.com/KiloNiner/personal-pages/actions/workflows/build.yml/badge.svg)](https://github.com/KiloNiner/personal-pages/actions/workflows/build.yml) (GitHub Actions, until the project moves to xwiki-contrib)
 
 ## Features
 
