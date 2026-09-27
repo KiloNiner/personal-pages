@@ -184,7 +184,11 @@
     ## The welcome texts come from the admin-controlled translations and are inserted as wiki markup.
     #set ($ppHeading = $services.localization.render('personalpages.page.heading'))
     #set ($ppIntro = $services.localization.render("personalpages.page.intro.$ppReaders"))
-    #set ($discard = $ppHomeDoc.setTitle($services.localization.render('personalpages.page.title', [$xwiki.getPlainUserName($ppUserRef)])))
+    ## The display name is user-controlled, and XWiki evaluates Velocity in titles with the rights of the page's content
+    ## author (the administrator when the bulk action creates the page). Escape it the way XWiki's own create page
+    ## dialog does, so that $ and # are displayed, never executed.
+    #set ($ppDisplayName = $escapetool.velocity($xwiki.getPlainUserName($ppUserRef)))
+    #set ($discard = $ppHomeDoc.setTitle($services.localization.render('personalpages.page.title', [$ppDisplayName])))
     #set ($discard = $ppHomeDoc.setSyntaxId('xwiki/2.1'))
     #set ($discard = $ppHomeDoc.setContent("= $ppHeading =$ppNl$ppNl$ppIntro$ppNl$ppNl{{children/}}$ppNl"))
     #set ($ppMarker = $ppHomeDoc.newObject('PersonalPages.Code.PersonalPageClass'))
