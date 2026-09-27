@@ -44,7 +44,8 @@ Users create their own pages with one click; administrators choose where they ar
    only the owner), so personal pages never depend on the permissions of the location page.
 3. `<location>.<username>.WebHome` is then saved **as the user**, with a `PersonalPages.Code.PersonalPageClass`
    marker object. A user's pages are found by that marker, and only count when the page's creator is the user or an
-   administrator. Users can edit the marker on their own pages but cannot change who created a page, so nobody can
+   administrator, and the page sits in a space named after the user (where personal pages are always created).
+   Users can edit the marker on their own pages but cannot change who created a page or where it lives, so nobody can
    claim someone else's pages, and moving the location later does not break anything.
 
 The shared logic lives in `PersonalPages.Code.Macros` (Velocity macros included by the hub, the drawer entry and the

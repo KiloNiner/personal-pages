@@ -110,8 +110,11 @@
 #end
 
 ## Finds the personal pages of a user, wherever they were created. Sets $ppFound (a document reference) or null.
-## A page only counts when its creator is the user (created with the button) or an administrator (created by the
-## administration action): users can edit the marker on their own pages, but they cannot change who created a page.
+## Owners can edit the marker on their own pages, so a candidate only counts when
+##  * its creator is the user (created with the button) or an administrator (created by the administration action):
+##    users cannot change who created a page, and
+##  * it sits in a space named after the user, which is where personal pages are always created: otherwise the owner
+##    of an administrator-created page could point its marker at another user and take over their "My pages".
 #macro (ppFindPages $ppUserRef)
   #set ($ppFound = $NULL)
   #ppUserString($ppUserRef)
@@ -120,7 +123,8 @@
     #if (!$ppFound)
       #set ($ppCandidateDoc = $xwiki.getDocumentAsAuthor($ppCandidate))
       #set ($ppCreatorRef = $ppCandidateDoc.creatorReference)
-      #if ($ppCreatorRef == $ppUserRef || $services.security.authorization.hasAccess('admin', $ppCreatorRef, $services.wiki.currentWikiReference))
+      #if ($ppCandidateDoc.documentReference.lastSpaceReference.name == $ppUserRef.name
+          &amp;&amp; ($ppCreatorRef == $ppUserRef || $services.security.authorization.hasAccess('admin', $ppCreatorRef, $services.wiki.currentWikiReference)))
         #set ($ppFound = $ppCandidateDoc.documentReference)
       #end
     #end
