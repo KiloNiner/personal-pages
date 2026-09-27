@@ -4,6 +4,8 @@ name: Build
 
 on:
   push:
+    # Branches only: version tags are built by the Release workflow.
+    branches: ['**']
   pull_request:
   workflow_dispatch:
 
