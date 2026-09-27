@@ -17,7 +17,8 @@ Users create their own pages with one click; administrators choose where they ar
 
 ## Features
 
-* **Create my personal page** button on `PersonalPages.WebHome`, and a **My pages** entry in the drawer menu.
+* **Create my personal page** button on `PersonalPages.WebHome`, a **My pages** entry in the drawer menu, and a
+  **Personal Pages** entry in the Applications panel.
 * **All personal pages** table on the hub (searchable, sortable, paged; rows filtered by the viewer's rights). It lists
   personal pages by their owner marker, so pages created under an earlier location are included.
 * **Personal pages** section in every user profile, linking to that user's pages (when the viewer may see them).
