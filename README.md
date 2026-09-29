@@ -1,5 +1,9 @@
 # Personal Pages Application
 
+> [!IMPORTANT]
+> **This repository has moved to [xwiki-contrib/personal-pages](https://github.com/xwiki-contrib/personal-pages)** and is archived.
+> Please file issues in [JIRA (PERSONALPG)](https://jira.xwiki.org/browse/PERSONALPG) and send pull requests to the new repository.
+
 Personal pages for every XWiki user, along the lines of the
 [Personal Pages design proposal](https://design.xwiki.org/xwiki/bin/view/Proposal/PersonalPages).
 Users create their own pages with one click; administrators choose where they are created and who can read them.
